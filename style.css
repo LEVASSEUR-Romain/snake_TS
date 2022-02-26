@@ -1,0 +1,23 @@
+* {
+    margin: 0;
+}
+
+body {
+    display: flex;
+}
+
+.jeu {
+    border: 5px solid black;
+    width: 1000px;
+    height: 800px;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+button {
+    margin-top: 10px;
+}
+
+.score {
+    margin-top: 10px;
+}
