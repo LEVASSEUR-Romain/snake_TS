@@ -1,3 +1,4 @@
+//DECLARATION VARIABLE
 interface positionXY {
   x: number;
   y: number;
@@ -6,43 +7,48 @@ const SNAKECOLOR = "red";
 const EATCOLOR = "green";
 const WITHPIXEL: number = 10;
 const HEIGHTPIXEL: number = 8;
-const FASTSNAKE: number = 1;
+const FASTSNAKEMILLISECOND: number = 150;
+const EATSCORE: number = 3;
+let score: number = 0;
+let timer: number;
 const positionStart: positionXY = { x: 0, y: 0 };
 let allPositionSnake: positionXY[] = [];
 let positionEat: positionXY | undefined;
-const lenghtStart: number = 1;
+const lenghtStart: number = 2;
 let directionSnake: string = "right";
 const canvasElement = document.getElementById("canvas") as HTMLCanvasElement;
-const startElement = document.getElementById("start");
-
+const scoreElement = document.getElementById("score") as HTMLSpanElement;
+const startElement = document.getElementById("start") as HTMLButtonElement;
+// ALL EVENT LISTENER
 startElement?.addEventListener("click", () => {
   play();
 });
 document.addEventListener("keydown", (event) => {
   switch (event.key) {
     case "ArrowDown":
-      moveSnakeTo("bottom");
+      directionSnake = directionSnake == "top" ? "top" : "bottom";
       break;
     case "ArrowUp":
-      moveSnakeTo("top");
+      directionSnake = directionSnake == "bottom" ? "bottom" : "top";
       break;
     case "ArrowLeft":
-      moveSnakeTo("left");
+      directionSnake = directionSnake == "right" ? "right" : "left";
       break;
     case "ArrowRight":
-      moveSnakeTo("right");
+      directionSnake = directionSnake == "left" ? "left" : "right";
       break;
   }
 });
-
+// FUNCTION GAMEPLAY
 const play = (): void => {
+  gameRefrech();
   let drawSnakeStrat = canvasElement.getContext("2d");
   if (drawSnakeStrat) {
     drawSnakeStrat.fillStyle = SNAKECOLOR;
     drawSnakeStrat.fillRect(
-      positionStart.x * WITHPIXEL,
-      positionStart.y * HEIGHTPIXEL,
-      WITHPIXEL,
+      positionStart.x,
+      positionStart.y,
+      WITHPIXEL * lenghtStart,
       HEIGHTPIXEL
     );
     for (let i = 0; i < lenghtStart; i++) {
@@ -52,20 +58,38 @@ const play = (): void => {
       });
     }
   }
-
-  moveSnakeTo(directionSnake);
   makeEatForSnake();
+  timer = setTimeout(moveSnakeTo, FASTSNAKEMILLISECOND);
 };
-const setSnake = (add: positionXY): void => {
-  allPositionSnake.push(add);
+const moveSnakeTo = (): void => {
+  switch (directionSnake) {
+    case "right":
+      drawAndStockSnakeAndVerifIsLoseOrIsEat({
+        x: getHeadSnakePosition().x + WITHPIXEL,
+        y: getHeadSnakePosition().y,
+      });
+      break;
+    case "left":
+      drawAndStockSnakeAndVerifIsLoseOrIsEat({
+        x: getHeadSnakePosition().x - WITHPIXEL,
+        y: getHeadSnakePosition().y,
+      });
+      break;
+    case "top":
+      drawAndStockSnakeAndVerifIsLoseOrIsEat({
+        x: getHeadSnakePosition().x,
+        y: getHeadSnakePosition().y - HEIGHTPIXEL,
+      });
+      break;
+    case "bottom":
+      drawAndStockSnakeAndVerifIsLoseOrIsEat({
+        x: getHeadSnakePosition().x,
+        y: getHeadSnakePosition().y + HEIGHTPIXEL,
+      });
+      break;
+  }
 };
-const getHeadSnakePosition = (): positionXY => {
-  return allPositionSnake[allPositionSnake.length - 1] ?? { x: 0, y: 0 };
-};
-const getEndSnakePosition = (): positionXY => {
-  return allPositionSnake[0] ?? { x: 0, y: 0 };
-};
-const drawAndStockSnake = (position: positionXY): void => {
+const drawAndStockSnakeAndVerifIsLoseOrIsEat = (position: positionXY): void => {
   let drawSnakeNewPosition = canvasElement.getContext("2d");
   if (drawSnakeNewPosition) {
     drawSnakeNewPosition.fillStyle = SNAKECOLOR;
@@ -75,57 +99,24 @@ const drawAndStockSnake = (position: positionXY): void => {
       WITHPIXEL,
       HEIGHTPIXEL
     );
+    if (snakeIsLose(position)) {
+      gameLose();
+    } else {
+      timer = setTimeout(moveSnakeTo, FASTSNAKEMILLISECOND);
+    }
+    if (snakeIsGoEatAndUpdateScore(position)) {
+      makeEatForSnake();
+    } else {
+      if (!snakeIsLose(position)) {
+        removeLastPostion();
+      }
+    }
     setSnake({
       x: position.x,
       y: position.y,
     });
-    removeLastPostion();
   }
 };
-
-const removeLastPostion = (): void => {
-  let drawSnakeDeletePosition = canvasElement.getContext("2d");
-  if (drawSnakeDeletePosition) {
-    drawSnakeDeletePosition.clearRect(
-      getEndSnakePosition().x,
-      getEndSnakePosition().y,
-      WITHPIXEL,
-      HEIGHTPIXEL
-    );
-    allPositionSnake.shift();
-    positionEat = undefined;
-  }
-};
-const moveSnakeTo = (direction: string): void => {
-  directionSnake = direction;
-  switch (direction) {
-    case "right":
-      drawAndStockSnake({
-        x: getHeadSnakePosition().x + WITHPIXEL,
-        y: getHeadSnakePosition().y,
-      });
-      break;
-    case "left":
-      drawAndStockSnake({
-        x: getHeadSnakePosition().x - WITHPIXEL,
-        y: getHeadSnakePosition().y,
-      });
-      break;
-    case "top":
-      drawAndStockSnake({
-        x: getHeadSnakePosition().x,
-        y: getHeadSnakePosition().y - HEIGHTPIXEL,
-      });
-      break;
-    case "bottom":
-      drawAndStockSnake({
-        x: getHeadSnakePosition().x,
-        y: getHeadSnakePosition().y + HEIGHTPIXEL,
-      });
-      break;
-  }
-};
-
 const makeEatForSnake = (): void => {
   let drawEatNewPosition = canvasElement.getContext("2d");
   if (drawEatNewPosition) {
@@ -149,7 +140,54 @@ const makeEatForSnake = (): void => {
     }
   }
 };
+const gameLose = (): void => {
+  alert("Perdu Dommage votre score est de " + score);
+};
+const updateScore = (): void => {
+  score += EATSCORE;
+  scoreElement.innerText = score.toString();
+};
+const deleteScore = (): void => {
+  score = 0;
+  scoreElement.innerText = score.toString();
+};
+const gameRefrech = (): void => {
+  emptyDrawElement();
+  allPositionSnake = [];
+  deleteScore();
+  directionSnake = "right";
+  clearTimeout(timer);
+  timer = 0;
+  positionEat = undefined;
+};
+const emptyDrawElement = (): void => {
+  let draw = canvasElement.getContext("2d");
+  draw?.clearRect(0, 0, canvasElement.width, canvasElement.height);
+};
 
+// function POSITION
+const setSnake = (add: positionXY): void => {
+  allPositionSnake.push(add);
+};
+const getHeadSnakePosition = (): positionXY => {
+  return allPositionSnake[allPositionSnake.length - 1] ?? { x: 0, y: 0 };
+};
+const getEndSnakePosition = (): positionXY => {
+  return allPositionSnake[0] ?? { x: 0, y: 0 };
+};
+const removeLastPostion = (): void => {
+  let drawSnakeDeletePosition = canvasElement.getContext("2d");
+  if (drawSnakeDeletePosition) {
+    drawSnakeDeletePosition.clearRect(
+      getEndSnakePosition().x,
+      getEndSnakePosition().y,
+      WITHPIXEL,
+      HEIGHTPIXEL
+    );
+    allPositionSnake.shift();
+  }
+};
+// function BOOLEAN
 const isOnTheSnake = (position: positionXY): boolean => {
   for (const i in allPositionSnake) {
     if (
@@ -162,6 +200,31 @@ const isOnTheSnake = (position: positionXY): boolean => {
   return false;
 };
 
-//function SnakeIsLose position x y en paramétre vérifier sur le bord ou sur le snake
-
-//facteur temps qui fait bougé le snake qui apelle la function moveSnake
+const isOutOnthePlay = (position: positionXY): boolean => {
+  const borderCanvasTop = 0;
+  const borderCanvasLeft = 0;
+  if (
+    position.x >= canvasElement.width ||
+    position.x < borderCanvasLeft ||
+    position.y >= canvasElement.height ||
+    position.y < borderCanvasTop
+  ) {
+    return true;
+  }
+  return false;
+};
+const snakeIsLose = (position: positionXY): boolean => {
+  if (isOnTheSnake(position) || isOutOnthePlay(position)) {
+    return true;
+  }
+  return false;
+};
+const snakeIsGoEatAndUpdateScore = (position: positionXY): boolean => {
+  if (positionEat !== undefined) {
+    if (position.x === positionEat.x && position.y === positionEat.y) {
+      updateScore();
+      return true;
+    }
+  }
+  return false;
+};
