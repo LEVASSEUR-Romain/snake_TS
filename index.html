@@ -10,7 +10,23 @@
   <body>
     <canvas class="jeu" id="canvas"></canvas>
     <button id="start">Start</button>
-    <div class="score">Votre score est de: <span id="score">0</span></div>
+    <section>
+      <div class="score">Votre score est de: <span id="score">0</span></div>
+      <label for="taille">Taille du snake (max 8)</label>
+      <input type="number" id="taille" />
+      <label for="colorSnake">Couleur du snake</label>
+      <input type="color" id="colorSnake" />
+      <label for="colorMiam">Couleur de l'individu a manger</label>
+      <input type="color" id="colorMiam" />
+      <label for="speed">Vitesse du snake en ms</label>
+      <input type="number" id="speed" />
+      <label for="widthSnake">Largeur du snake dans le dessin</label>
+      <input type="number" id="widthSnake" />
+      <label for="heightSnake">Hauteur du snake dans le dessin</label>
+      <input type="number" id="heightSnake" />
+      <button id="changement">Valider les changements</button>
+      <button id="default">Par défaut</button>
+    </section>
     <script src="./dist/app.js"></script>
   </body>
 </html>

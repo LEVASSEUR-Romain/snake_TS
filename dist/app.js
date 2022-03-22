@@ -1,20 +1,52 @@
 "use strict";
-const SNAKECOLOR = "red";
-const EATCOLOR = "green";
-const WITHPIXEL = 10;
-const HEIGHTPIXEL = 8;
-const FASTSNAKEMILLISECOND = 150;
-const EATSCORE = 3;
+let SNAKECOLOR;
+let EATCOLOR;
+let WITHPIXEL;
+let HEIGHTPIXEL;
+let FASTSNAKEMILLISECOND;
+let EATSCORE = 3;
 let score = 0;
+let lenghtStart;
 let timer;
 const positionStart = { x: 0, y: 0 };
 let allPositionSnake = [];
 let positionEat;
-const lenghtStart = 2;
 let directionSnake = "right";
 const canvasElement = document.getElementById("canvas");
 const scoreElement = document.getElementById("score");
 const startElement = document.getElementById("start");
+const inputChangement = document.getElementById("changement");
+const buttonDefault = document.getElementById("default");
+const cutInput = document.getElementById("taille");
+const snakeColorInput = document.getElementById("colorSnake");
+const miamColorInput = document.getElementById("colorMiam");
+const speedInput = document.getElementById("speed");
+const wSInput = document.getElementById("widthSnake");
+const hSInput = document.getElementById("heightSnake");
+const defaultConst = () => {
+    SNAKECOLOR = "#FF0000";
+    EATCOLOR = "#0000FF";
+    WITHPIXEL = 10;
+    HEIGHTPIXEL = 8;
+    FASTSNAKEMILLISECOND = 150;
+    lenghtStart = 3;
+    snakeColorInput.value = SNAKECOLOR;
+    miamColorInput.value = EATCOLOR;
+    wSInput.value = WITHPIXEL.toString();
+    hSInput.value = HEIGHTPIXEL.toString();
+    speedInput.value = FASTSNAKEMILLISECOND.toString();
+    cutInput.value = lenghtStart.toString();
+};
+defaultConst();
+const updateConstFormulaire = () => {
+    SNAKECOLOR = snakeColorInput.value;
+    EATCOLOR = miamColorInput.value;
+    WITHPIXEL = parseInt(wSInput.value);
+    HEIGHTPIXEL = parseInt(hSInput.value);
+    FASTSNAKEMILLISECOND = parseInt(speedInput.value);
+    lenghtStart =
+        parseInt(cutInput.value) < 9 ? parseInt(cutInput.value) : lenghtStart;
+};
 // ALL EVENT LISTENER
 startElement === null || startElement === void 0 ? void 0 : startElement.addEventListener("click", () => {
     play();
@@ -35,6 +67,8 @@ document.addEventListener("keydown", (event) => {
             break;
     }
 });
+inputChangement.addEventListener("click", updateConstFormulaire);
+buttonDefault.addEventListener("click", defaultConst);
 // FUNCTION GAMEPLAY
 const play = () => {
     gameRefrech();

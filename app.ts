@@ -3,22 +3,60 @@ interface positionXY {
   x: number;
   y: number;
 }
-const SNAKECOLOR = "red";
-const EATCOLOR = "green";
-const WITHPIXEL: number = 10;
-const HEIGHTPIXEL: number = 8;
-const FASTSNAKEMILLISECOND: number = 150;
-const EATSCORE: number = 3;
+
+let SNAKECOLOR: string;
+let EATCOLOR: string;
+let WITHPIXEL: number;
+let HEIGHTPIXEL: number;
+let FASTSNAKEMILLISECOND: number;
+let EATSCORE: number = 3;
 let score: number = 0;
+let lenghtStart: number;
 let timer: number;
 const positionStart: positionXY = { x: 0, y: 0 };
 let allPositionSnake: positionXY[] = [];
 let positionEat: positionXY | undefined;
-const lenghtStart: number = 2;
 let directionSnake: string = "right";
 const canvasElement = document.getElementById("canvas") as HTMLCanvasElement;
 const scoreElement = document.getElementById("score") as HTMLSpanElement;
 const startElement = document.getElementById("start") as HTMLButtonElement;
+const inputChangement = document.getElementById(
+  "changement"
+) as HTMLButtonElement;
+const buttonDefault = document.getElementById("default") as HTMLButtonElement;
+const cutInput = document.getElementById("taille") as HTMLInputElement;
+const snakeColorInput = document.getElementById(
+  "colorSnake"
+) as HTMLInputElement;
+const miamColorInput = document.getElementById("colorMiam") as HTMLInputElement;
+const speedInput = document.getElementById("speed") as HTMLInputElement;
+const wSInput = document.getElementById("widthSnake") as HTMLInputElement;
+const hSInput = document.getElementById("heightSnake") as HTMLInputElement;
+const defaultConst = () => {
+  SNAKECOLOR = "#FF0000";
+  EATCOLOR = "#0000FF";
+  WITHPIXEL = 10;
+  HEIGHTPIXEL = 8;
+  FASTSNAKEMILLISECOND = 150;
+  lenghtStart = 3;
+  snakeColorInput.value = SNAKECOLOR;
+  miamColorInput.value = EATCOLOR;
+  wSInput.value = WITHPIXEL.toString();
+  hSInput.value = HEIGHTPIXEL.toString();
+  speedInput.value = FASTSNAKEMILLISECOND.toString();
+  cutInput.value = lenghtStart.toString();
+};
+defaultConst();
+const updateConstFormulaire = () => {
+  SNAKECOLOR = snakeColorInput.value;
+  EATCOLOR = miamColorInput.value;
+  WITHPIXEL = parseInt(wSInput.value);
+  HEIGHTPIXEL = parseInt(hSInput.value);
+  FASTSNAKEMILLISECOND = parseInt(speedInput.value);
+  lenghtStart =
+    parseInt(cutInput.value) < 9 ? parseInt(cutInput.value) : lenghtStart;
+};
+
 // ALL EVENT LISTENER
 startElement?.addEventListener("click", () => {
   play();
@@ -39,6 +77,8 @@ document.addEventListener("keydown", (event) => {
       break;
   }
 });
+inputChangement.addEventListener("click", updateConstFormulaire);
+buttonDefault.addEventListener("click", defaultConst);
 // FUNCTION GAMEPLAY
 const play = (): void => {
   gameRefrech();

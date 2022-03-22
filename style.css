@@ -18,6 +18,10 @@ button {
     margin-top: 10px;
 }
 
-.score {
+section {
     margin-top: 10px;
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }

@@ -4,7 +4,6 @@
     "target": "ES6",
     "noEmitOnError": true,
     "strict": true
-    /* "noUncheckedIndexedAccess": true */
   },
   "files": ["app.ts"]
 }
