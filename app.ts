@@ -17,6 +17,7 @@ const positionStart: positionXY = { x: 0, y: 0 };
 let allPositionSnake: positionXY[] = [];
 let positionEat: positionXY | undefined;
 let directionSnake: string = "right";
+let previosDirection: string = directionSnake;
 const canvasElement = document.getElementById("canvas") as HTMLCanvasElement;
 const scoreElement = document.getElementById("score") as HTMLSpanElement;
 const startElement = document.getElementById("start") as HTMLButtonElement;
@@ -64,16 +65,16 @@ startElement?.addEventListener("click", () => {
 document.addEventListener("keydown", (event) => {
   switch (event.key) {
     case "ArrowDown":
-      directionSnake = directionSnake == "top" ? "top" : "bottom";
+      directionSnake = directionSnake === "top" ? "top" : "bottom";
       break;
     case "ArrowUp":
-      directionSnake = directionSnake == "bottom" ? "bottom" : "top";
+      directionSnake = directionSnake === "bottom" ? "bottom" : "top";
       break;
     case "ArrowLeft":
-      directionSnake = directionSnake == "right" ? "right" : "left";
+      directionSnake = directionSnake === "right" ? "right" : "left";
       break;
     case "ArrowRight":
-      directionSnake = directionSnake == "left" ? "left" : "right";
+      directionSnake = directionSnake === "left" ? "left" : "right";
       break;
   }
 });
@@ -102,7 +103,7 @@ const play = (): void => {
   timer = setTimeout(moveSnakeTo, FASTSNAKEMILLISECOND);
 };
 const moveSnakeTo = (): void => {
-  switch (directionSnake) {
+  switch (errorDirectionHelper()) {
     case "right":
       drawAndStockSnakeAndVerifIsLoseOrIsEat({
         x: getHeadSnakePosition().x + WITHPIXEL,
@@ -129,6 +130,27 @@ const moveSnakeTo = (): void => {
       break;
   }
 };
+
+const errorDirectionHelper = (): string => {
+  // Pour éviter les spam de touche
+  switch (directionSnake) {
+    case "bottom":
+      directionSnake = previosDirection === "top" ? "top" : "bottom";
+      break;
+    case "top":
+      directionSnake = previosDirection === "bottom" ? "bottom" : "top";
+      break;
+    case "left":
+      directionSnake = previosDirection === "right" ? "right" : "left";
+      break;
+    case "right":
+      directionSnake = previosDirection === "left" ? "left" : "right";
+      break;
+  }
+  previosDirection = directionSnake;
+  return directionSnake;
+};
+
 const drawAndStockSnakeAndVerifIsLoseOrIsEat = (position: positionXY): void => {
   let drawSnakeNewPosition = canvasElement.getContext("2d");
   if (drawSnakeNewPosition) {
@@ -196,6 +218,7 @@ const gameRefrech = (): void => {
   allPositionSnake = [];
   deleteScore();
   directionSnake = "right";
+  previosDirection = "right";
   clearTimeout(timer);
   timer = 0;
   positionEat = undefined;
